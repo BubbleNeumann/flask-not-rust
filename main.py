@@ -12,6 +12,14 @@ def index():
 def about():
     return render_template('about.html')
 
+@app.route("/auth/sign_up")
+def sign_up():
+    return render_template('auth/signup.html')
+
+@app.route("/auth/login")
+def login():
+    return render_template('auth/login.html')
+
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
