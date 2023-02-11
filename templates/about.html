@@ -1,16 +1,9 @@
-<!doctype html>
-<html lang="eng">
+{% extends "base.html" %}
 
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>about</title>
-    </head>
+{% block title %}About{% endblock %}
 
-    <body style="background-color: #dcdcdc;">
-        <div style="background-color: #f2f2f2; padding: 15px; margin-bottom: 30px; margin-top: 20px;">
-            <h3>About</h3>
-        </div>
-    </body>
-</html>
-
+{% block page_content %}
+    <div style="background-color: #f2f2f2; padding: 15px; margin-bottom: 30px; margin-top: 20px;">
+        <h3>About</h3>
+    </div>
+{% endblock %}
