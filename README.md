@@ -1,6 +1,6 @@
 ### Project design
 
-![design.jpg]
+![design.jpg](https://github.com/BubbleNeumann/flask-not-rust/blob/master/design.jpg)
 
 ### Project sructure example
 
