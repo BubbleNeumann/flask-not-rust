@@ -43,6 +43,10 @@ def index():
 def about():
     return render_template('about.html')
 
+@app.route("/browse")
+def browse():
+    return render_template('browse.html')
+
 @app.route("/auth/sign_up", methods=['GET', 'POST'])
 def sign_up():
     # if session['known']:
