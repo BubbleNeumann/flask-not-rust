@@ -14,4 +14,5 @@ build/
 *.egg-info/
 
 data.sqlite
+*.db
 keys.py

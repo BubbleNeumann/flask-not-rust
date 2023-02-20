@@ -6,7 +6,7 @@ from flask_wtf.recaptcha import validators
 from wtforms import StringField, SubmitField
 from wtforms.fields import EmailField
 from wtforms.validators import DataRequired, Email
-from flask_sqlalchemy import SQLAlchemy
+# from flask_sqlalchemy import SQLAlchemy
 
 import keys
 
@@ -14,11 +14,11 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = keys.SECRET_KEY
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'data.sqlite')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'data.sqlite')
+# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 bootstrap = Bootstrap(app)
-db = SQLAlchemy(app)
+# db = SQLAlchemy(app)
 
 class SignUpForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
@@ -26,14 +26,15 @@ class SignUpForm(FlaskForm):
     submit = SubmitField('Submit')
 
 
-class User(db.Model):
-    __tablename__ = 'users'
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(64), index=True)
-    email = db.Column(db.String(64), unique=True, index=True)
-
-    def __repr__(self):
-        return '<User %r>' % self.username % self.email
+# class User(db.Model):
+#     __tablename__ = 'users'
+#     id = db.Column(db.Integer, primary_key=True)
+#     username = db.Column(db.String(64), index=True)
+#     email = db.Column(db.String(64), unique=True, index=True)
+#
+#     def __repr__(self):
+#         # return '<User %r>' %self.username
+#         return f'User {self.id} {self.username} {self.email}'
 
 @app.route("/")
 def index():
@@ -52,19 +53,19 @@ def sign_up():
     # if session['known']:
     #     return redirect(url_for('index'))
     form = SignUpForm()
-    if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
-        if user is None:
-            user = User(username=form.username.data, email=form.email.data)
-            db.session.add(user)
-            db.session.commit()
-            session['known'] = False
-        else:
-            session['known'] = True
-        session['username'] = form.username.data
-        session['email'] = form.email.data
-        form.username.data = form.email.data = ''
-        return redirect(url_for('index'))
+    # if form.validate_on_submit():
+    #     user = User.query.filter_by(username=form.username.data).first()
+    #     if user is None:
+    #         user = User(username=form.username.data, email=form.email.data)
+    #         db.session.add(user)
+    #         db.session.commit()
+    #         session['known'] = False
+    #     else:
+    #         session['known'] = True
+    #     session['username'] = form.username.data
+    #     session['email'] = form.email.data
+    #     form.username.data = form.email.data = ''
+    #     return redirect(url_for('index'))
     return render_template('auth/signup.html', form=form,
                            username=session.get('username'), known=session.get('known', False))
 
