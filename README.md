@@ -1,6 +1,8 @@
+
+
 ## Project design
 
-![design.jpg](https://github.com/BubbleNeumann/flask-not-rust/blob/master/design.jpg)
+![design.jpg](https://raw.githubusercontent.com/BubbleNeumann/flask-not-rust/master/design.jpg)
 
 ### Project sructure example
 
@@ -48,18 +50,23 @@ db.create_all()
 #### Insert Rows
 
 from main import User
+
 user_a = User(username='a', email='a@email.com')
+
 db.session.add(user_a)
 
 alternatively:
+
 db.session.add_all([user_a, user_b])
 
 print(user_a.id)
+
 db.session.commit()
 
 #### Delete Rows
 
 db.session.delete(user_a)
+
 db.session.commit()
 
 
