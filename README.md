@@ -39,7 +39,7 @@
 ### "How to" section
 #### Run app
 
-$ flask --app main run
+$ flask --app flask_not_rust run
 
 #### Create the table
 
