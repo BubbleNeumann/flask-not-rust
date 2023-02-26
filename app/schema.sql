@@ -4,7 +4,7 @@ create table Users (
     id integer primary key autoincrement,
     username varchar not null,
     email varchar not null,
-    password text not null,
+    password varchar not null,
     role_id integer not null,
     critics_att varchar,
     foreign key (role_id) references Roles(id)
@@ -25,7 +25,7 @@ create table Texts (
     text_file varchar not null,
     release_date date not null,
     lang varchar not null,
-    descr text not null,
+    descr varchar not null,
     age_restr integer not null
 );
 
@@ -33,7 +33,7 @@ drop table if exists Texts_Users;
 
 create table Texts_Users (
     text_id integer not null,
-    user_id integet not null,
+    user_id integer not null,
     is_author boolean not null,
     foreign key (text_id) references Texts(id),
     foreign key (user_id) references Users(id)
@@ -49,6 +49,8 @@ create table Permissions (
 drop table if exists Roles_Permissions;
 
 create table Roles_Permissions (
+    permission_id integer not null,
+    role_id integer not null,
     foreign key (permission_id) references Permissions(id),
     foreign key (role_id) references Role(id)
 );
@@ -63,6 +65,8 @@ create table Tags (
 drop table if exists Texts_Tags;
 
 create table Texts_Tags (
+    text_id integer not null,
+    tag_id integer not null,
     foreign key (text_id) references Text(id),
     foreign key (tag_id) references Tag(id)
 );
@@ -74,7 +78,11 @@ create table Fandoms (
     name varchar not null
 );
 
+drop table if exists Texts_Fandoms;
+
 create table Texts_Fandoms (
+    text_id integer not null,
+    fandom_id integer not null,
     foreign key (text_id) references Text(id),
     foreign key (fandom_id) references Fandom(id)
 );

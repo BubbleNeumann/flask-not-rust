@@ -1,22 +1,62 @@
 import sqlite3
+import sys
 
-connection = sqlite3.connect('database.db')
+def main():
+    connection = sqlite3.connect('database.db')
 
-# create empty tables
-with open('schema.sql') as f:
-    connection.executescript(f.read())
+    # create empty tables
+    with open('app/schema.sql') as f:
+        connection.executescript(f.read())
 
-# fill tables with test data
-cur = connection.cursor()
+    connection.commit()
+    connection.close()
 
-# Roles
-cur.execute('INSERT INTO Roles (name) VALUES (?)', ('admin',))
-cur.execute('INSERT INTO Roles (name) VALUES (?)', ('user',))
+def fill_tables():
+    connection = sqlite3.connect('database.db')
+    cur = connection.cursor()
 
-# Users
-# for i in range(10):
-#     cur.execute('INSERT INTO Users (), VALUES ()', ('',))
+    # Roles
+    cur.execute('INSERT INTO Roles (name) VALUES (?)', ('admin',))
+    cur.execute('INSERT INTO Roles (name) VALUES (?)', ('user',))
 
-connection.commit()
-connection.close()
+    # Tags
+    cur.execute('INSERT INTO Tags (name) VALUES (?)', ('Action',))
+
+    # Fandoms
+    cur.execute('INSERT INTO Fandoms (name) VALUES (?)', ('The Witcher',))
+
+    # Permissions
+    perms = ['post', 'ban']
+    for perm in perms:
+        cur.execute('INSERT INTO Permissions (name) VALUES (?)', (perm,))
+
+    # Roles_Permissions
+    # admin can post and ban, user can post
+    interrel = [('1','1'), ('2','1'), ('1','2')]
+    for rel in interrel:
+        cur.execute('INSERT INTO Roles_Permissions (permission_id, role_id) VALUES (?, ?)', rel)
+
+    for i in range(5):
+        cur.execute('INSERT INTO Users (username, email, password, role_id) VALUES (?, ?, ?, ?)',
+                    (f'name{i}', f'email{i}', f'pass{i}', '2'))
+        cur.execute('INSERT INTO Texts (title, text_file, release_date, lang, descr, age_restr) VALUES (?, ?, ?, ?, ?, ?)',
+                    (f'title{i}', f'path{i}', '2023-02-26', 'eng', 'desc', '13'))
+
+        cur.execute('INSERT INTO Texts_Users (text_id, user_id, is_author) VALUES (?, ?, ?)',
+                    (f'{i}', '3', '1'))
+
+        cur.execute('INSERT INTO Texts_Tags (text_id, tag_id) VALUES (?, ?)',
+                    (f'{i}', '1'))
+
+        cur.execute('INSERT INTO Texts_Fandoms (text_id, fandom_id) VALUES (?, ?)',
+                    (f'{i}', '1'))
+        
+
+    connection.commit()
+    connection.close()
+
+if __name__ == '__main__':
+    main()
+    if len(sys.argv) > 1 and sys.argv[1] == '--with-data':
+        fill_tables()
 
