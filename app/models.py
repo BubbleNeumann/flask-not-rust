@@ -21,11 +21,22 @@ class User:
         connection.close()
         return text_titles
 
-    def delete_from_db(self) -> None:
-        connection = sqlite3.connect('database.db')
-        connection.cursor().execute(f'delete from Users where id = {self.id}')
-        connection.commit()
-        connection.close()
+    def delete_from_db(self, cur=None) -> None:
+        cur_was_passed = True if cur is not None else False
+        if cur is None:
+            connection = sqlite3.connect('database.db')
+            cur = connection.cursor()
+
+        texts_to_delete = cur.execute(f'select Texts.* from Texts inner join Texts_Users \
+                on Texts.id = Texts_Users.text_id where Texts_Users.user_id = {self.id}')
+
+        for text in texts_to_delete:
+            Text(*text).delete_from_db(cur=cur)
+
+        cur.execute(f'delete from users where id = {self.id}')
+        if not cur_was_passed:
+            connection.commit()
+            connection.close()
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}: {self.username} {self.email} \
@@ -42,16 +53,36 @@ class Text:
         self.descr = descr
         self.age_restr = age_restr
 
-    def update_title(self, new_title: str) -> None:
-        # return f''
-        pass
+    def delete_from_db(self, cur=None) -> None:
+        cur_was_passed = True if cur is not None else False
+        if cur is None:
+            connection = sqlite3.connect('database.db')
+            cur = connection.cursor()
+        cur.execute(f'delete from Texts where id = {self.id}')
 
-    def add_tag_query(self, tag_id: int) -> str:
-        return f''
+        # tables with the same field name
+        # tables = ['Texts_Users', 'Texts_Tags', 'Texts_Fandoms']
+        for table in ['Texts_Users', 'Texts_Tags', 'Texts_Fandoms']:
+            cur.execute(f'delete from {table} where text_id = {self.id}')
 
-    def add_coauthor_query(self, user: User) -> str:
-        return f''
+        if not cur_was_passed:
+            connection.commit()
+            connection.close()
 
     def __repr__(self) -> str:
-        # TODO fetch author and fandom
-        return f'{self.__class__.__name__}: {self.title}'
+        connection = sqlite3.connect('database.db')
+        query = f'select Users.username from Texts_Users inner join Users \
+                on Texts_Users.user_id = Users.id where Texts_Users.is_author = 1 \
+                and Texts_Users.text_id = {self.id}'
+        author = connection.cursor().execute(query).fetchone()[0]
+        connection.close()
+        return f'{self.__class__.__name__}: {self.title} by {author} published {self.release_date}'
+    
+
+class Tag:
+    def __init__(self, id, name) -> None:
+        self.id = id
+        self.name = name
+
+    def delete_from_db(self) -> None:
+        pass
