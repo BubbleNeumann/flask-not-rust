@@ -33,5 +33,14 @@ test_user.delete_from_db(cur=cur)
 users = cur.execute('select * from Users').fetchall()
 print(users)
 
+# test User write_to_db()
+# test_user = User(*users[0])
+# print()
+new_test_user = User(username='newname', email='newemail', password='pass', role_id='2')
+new_test_user.write_to_db(cur=cur)
+users = cur.execute('select * from Users').fetchall()
+print(users)
+
+
 connection.commit()
 connection.close()

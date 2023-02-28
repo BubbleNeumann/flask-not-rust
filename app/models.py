@@ -1,7 +1,7 @@
 import sqlite3
 
 class User:
-    def __init__(self, id, username, email, password, role_id, critics_att=None) -> None:
+    def __init__(self,  username, email, password, role_id, id=None, critics_att=None) -> None:
         self.id = id
         self.username = username
         self.email = email
@@ -21,6 +21,18 @@ class User:
         connection.close()
         return text_titles
 
+    def write_to_db(self, cur=None) -> None:
+        """Insert new user into Users"""
+        cur_was_passed = True if cur is not None else False
+        if cur is None:
+            connection = sqlite3.connect('database.db')
+            cur = connection.cursor()
+        cur.execute('INSERT INTO Users (username, email, password, role_id) VALUES (?, ?, ?, ?)',
+                    (self.username, self.email, self.password, self.role_id))
+        if not cur_was_passed:
+            connection.commit()
+            connection.close()
+
     def delete_from_db(self, cur=None) -> None:
         cur_was_passed = True if cur is not None else False
         if cur is None:
@@ -33,7 +45,7 @@ class User:
         for text in texts_to_delete:
             Text(*text).delete_from_db(cur=cur)
 
-        cur.execute(f'delete from users where id = {self.id}')
+        cur.execute(f'delete from Users where id = {self.id}')
         if not cur_was_passed:
             connection.commit()
             connection.close()
@@ -61,7 +73,6 @@ class Text:
         cur.execute(f'delete from Texts where id = {self.id}')
 
         # tables with the same field name
-        # tables = ['Texts_Users', 'Texts_Tags', 'Texts_Fandoms']
         for table in ['Texts_Users', 'Texts_Tags', 'Texts_Fandoms']:
             cur.execute(f'delete from {table} where text_id = {self.id}')
 
