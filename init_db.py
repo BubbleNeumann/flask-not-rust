@@ -16,8 +16,8 @@ def fill_tables():
     cur = connection.cursor()
 
     # Roles
-    cur.execute('INSERT INTO Roles (name) VALUES (?)', ('admin',))
-    cur.execute('INSERT INTO Roles (name) VALUES (?)', ('user',))
+    for role in ['admin', 'user', 'banned']:
+        cur.execute(f'insert into Roles (name) VALUES (?)', (role,))
 
     # Tags
     cur.execute('INSERT INTO Tags (name) VALUES (?)', ('Action',))
@@ -26,9 +26,8 @@ def fill_tables():
     cur.execute('INSERT INTO Fandoms (name) VALUES (?)', ('The Witcher',))
 
     # Permissions
-    perms = ['post', 'ban']
-    for perm in perms:
-        cur.execute('INSERT INTO Permissions (name) VALUES (?)', (perm,))
+    for permis in ['post', 'ban']:
+        cur.execute('INSERT INTO Permissions (name) VALUES (?)', (permis,))
 
     # Roles_Permissions
     # admin can post and ban, user can post

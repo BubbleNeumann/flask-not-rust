@@ -1,7 +1,7 @@
-import sqlite3
+from . import db
 
 class User:
-    def __init__(self,  username, email, password, role_id, id=None, critics_att=None) -> None:
+    def __init__(self, id, username, email, password, role_id, critics_att=None) -> None:
         self.id = id
         self.username = username
         self.email = email
@@ -9,49 +9,33 @@ class User:
         self.role_id = role_id
         self.critics_att = critics_att
 
-    def update_username_query(self, new_username: str) -> str:
-        # on this stage consider new username to be valid
-        return f'update Users set username = {new_username} where id = {self.id}'
-
     def get_texts(self) -> list:
-        connection = sqlite3.connect('database.db')
-        query = f'select Texts.title from Texts_Users inner join Texts \
-            on Texts_Users.text_id = Texts.id where Texts_Users.user_id = {self.id}'
-        text_titles = connection.cursor().execute(query).fetchall()
-        connection.close()
-        return text_titles
+        return db.run_select(query=f'select Texts.title from Texts_Users join Texts \
+            on Texts_Users.text_id = Texts.id where Texts_Users.user_id = {self.id}')
 
-    def write_to_db(self, cur=None) -> None:
-        """Insert new user into Users"""
-        cur_was_passed = True if cur is not None else False
-        if cur is None:
-            connection = sqlite3.connect('database.db')
-            cur = connection.cursor()
-        cur.execute('INSERT INTO Users (username, email, password, role_id) VALUES (?, ?, ?, ?)',
-                    (self.username, self.email, self.password, self.role_id))
-        if not cur_was_passed:
-            connection.commit()
-            connection.close()
+    def write_to_db(self, con=None, cur=None) -> None:
+         self.id = db.modify_table(query=f'insert into Users (username, email, password, role_id) \
+                values ("{self.username}", "{self.email}", "{self.password}", "{self.role_id}")', con=con)
 
-    def delete_from_db(self, cur=None) -> None:
-        cur_was_passed = True if cur is not None else False
-        if cur is None:
-            connection = sqlite3.connect('database.db')
-            cur = connection.cursor()
+    def add_text(self, text, cur=None) -> None:
+        text.write_to_db(user_id=self.id, cur=cur)
 
-        texts_to_delete = cur.execute(f'select Texts.* from Texts inner join Texts_Users \
+    # TODO test this
+    @staticmethod
+    def get_user_by_id(id: int):
+        return User(*db.run_select(query=f'select * from User where id = {id}'))
+
+    def delete_from_db(self, con=None) -> None:
+        texts_to_delete = db.run_select(query=f'select Texts.* from Texts join Texts_Users \
                 on Texts.id = Texts_Users.text_id where Texts_Users.user_id = {self.id}')
 
         for text in texts_to_delete:
-            Text(*text).delete_from_db(cur=cur)
+            Text(*text).delete_from_db(con=con)
 
-        cur.execute(f'delete from Users where id = {self.id}')
-        if not cur_was_passed:
-            connection.commit()
-            connection.close()
+        db.modify_table(query=f'delete from Users where id = "{self.id}"', con=con)
 
     def __repr__(self) -> str:
-        return f'{self.__class__.__name__}: {self.username} {self.email} \
+        return f'{self.__class__.__name__}: {self.id} {self.username} {self.email} \
             {"admin" if self.role_id == 1 else ""}'
 
 
@@ -65,35 +49,41 @@ class Text:
         self.descr = descr
         self.age_restr = age_restr
 
-    def delete_from_db(self, cur=None) -> None:
-        cur_was_passed = True if cur is not None else False
-        if cur is None:
-            connection = sqlite3.connect('database.db')
-            cur = connection.cursor()
-        cur.execute(f'delete from Texts where id = {self.id}')
+    # TODO implement this
+    @staticmethod
+    def get_text_by_id(id: int):
+        pass
 
-        # tables with the same field name
+    # TODO implement this
+    def get_tags(self) -> list:
+        return []
+
+    def get_fandoms(self) -> list:
+        query = f'select Tags.name from Tags join Text_Tags \
+                on Tags.id = Text_Tags.tag_id where Text_Tags.text_id = {self.id}'
+        return db.run_select(query=query)
+
+    def write_to_db(self, user_id: int, con=None) -> None:
+        query = f'insert into Texts (title, text_file, release_date, lang, descr, age_restr)\
+                values ("{self.title}", "{self.text_file}", "{self.release_date}", \
+                        "{self.lang}", "{self.descr}", "{self.age_restr}")'
+
+        self.id = db.modify_table(query=query, con=con)
+        query = f'insert into Texts_Users (text_id, user_id, is_author)\
+                values ("{self.id}", "{user_id}", "1")'
+        db.modify_table(query=query, con=con)
+
+    def delete_from_db(self, con=None) -> None:
+        db.modify_table(query=f'delete from Texts where id = "{self.id}"', con=con)
+
+        # junction tables with the same field name
         for table in ['Texts_Users', 'Texts_Tags', 'Texts_Fandoms']:
-            cur.execute(f'delete from {table} where text_id = {self.id}')
-
-        if not cur_was_passed:
-            connection.commit()
-            connection.close()
+            db.modify_table(query=f'delete from {table} where text_id="{self.id}"', con=con)
 
     def __repr__(self) -> str:
-        connection = sqlite3.connect('database.db')
         query = f'select Users.username from Texts_Users inner join Users \
                 on Texts_Users.user_id = Users.id where Texts_Users.is_author = 1 \
                 and Texts_Users.text_id = {self.id}'
-        author = connection.cursor().execute(query).fetchone()[0]
-        connection.close()
+        author = db.run_select(query=query)
         return f'{self.__class__.__name__}: {self.title} by {author} published {self.release_date}'
-    
 
-class Tag:
-    def __init__(self, id, name) -> None:
-        self.id = id
-        self.name = name
-
-    def delete_from_db(self) -> None:
-        pass
