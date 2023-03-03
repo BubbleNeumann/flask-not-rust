@@ -13,17 +13,16 @@ class User:
         return db.run_select(query=f'select Texts.title from Texts_Users join Texts \
             on Texts_Users.text_id = Texts.id where Texts_Users.user_id = {self.id}')
 
-    def write_to_db(self, con=None, cur=None) -> None:
+    def write_to_db(self, con=None) -> None:
          self.id = db.modify_table(query=f'insert into Users (username, email, password, role_id) \
                 values ("{self.username}", "{self.email}", "{self.password}", "{self.role_id}")', con=con)
 
-    def add_text(self, text, cur=None) -> None:
-        text.write_to_db(user_id=self.id, cur=cur)
+    def add_text(self, text, con=None) -> None:
+        text.write_to_db(user_id=self.id, con=con)
 
-    # TODO test this
     @staticmethod
     def get_user_by_id(id: int):
-        return User(*db.run_select(query=f'select * from User where id = {id}'))
+        return User(*db.run_select(query=f'select * from Users where id = {id}')[0])
 
     def delete_from_db(self, con=None) -> None:
         texts_to_delete = db.run_select(query=f'select Texts.* from Texts join Texts_Users \
@@ -49,18 +48,18 @@ class Text:
         self.descr = descr
         self.age_restr = age_restr
 
-    # TODO implement this
     @staticmethod
     def get_text_by_id(id: int):
-        pass
+        return Text(*db.run_select(query=f'select * from Texts where id = {id}')[0])
 
-    # TODO implement this
     def get_tags(self) -> list:
-        return []
+        query = f'select Tags.* from Tags join Texts_Tags \
+                on Tags.id = Texts_Tags.tag_id where Texts_Tags.text_id = {self.id}'
+        return db.run_select(query=query)
 
     def get_fandoms(self) -> list:
-        query = f'select Tags.name from Tags join Text_Tags \
-                on Tags.id = Text_Tags.tag_id where Text_Tags.text_id = {self.id}'
+        query = f'select Tags.name from Tags join Texts_Tags \
+                on Tags.id = Texts_Tags.tag_id where Texts_Tags.text_id = {self.id}'
         return db.run_select(query=query)
 
     def write_to_db(self, user_id: int, con=None) -> None:
@@ -73,6 +72,7 @@ class Text:
                 values ("{self.id}", "{user_id}", "1")'
         db.modify_table(query=query, con=con)
 
+
     def delete_from_db(self, con=None) -> None:
         db.modify_table(query=f'delete from Texts where id = "{self.id}"', con=con)
 
@@ -84,6 +84,6 @@ class Text:
         query = f'select Users.username from Texts_Users inner join Users \
                 on Texts_Users.user_id = Users.id where Texts_Users.is_author = 1 \
                 and Texts_Users.text_id = {self.id}'
-        author = db.run_select(query=query)
+        author = db.run_select(query=query)[0][0]
         return f'{self.__class__.__name__}: {self.title} by {author} published {self.release_date}'
 
