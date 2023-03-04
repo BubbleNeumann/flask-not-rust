@@ -16,7 +16,6 @@ class SignUpForm(FlaskForm):
         pass
 
     def validate_email(self, field):
-        # TODO write sql query
         pass
 
 class LoginForm(FlaskForm):
