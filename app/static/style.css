@@ -11,3 +11,15 @@ h3 {
     color: #cccccc;
 }
 
+h6 {
+    color: #cccccc;
+}
+
+.search-container table{
+    width: 30%;
+    border: 0px solid;
+}
+
+.search-container label {
+    color: #cccccc;
+}

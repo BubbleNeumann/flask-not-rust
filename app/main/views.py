@@ -37,6 +37,10 @@ def about():
 def browse():
     return render_template('browse.html')
 
+@main.route('/search')
+def search():
+    return render_template('search.html')
+
 @main.route('/auth/sign_up')
 def sign_up():
     form = SignUpForm()

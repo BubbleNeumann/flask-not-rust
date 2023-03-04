@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Search{% endblock %}
+
+<div style="background-color: #f2f2f2; padding: 15px; margin-bottom: 30px; margin-top: 20px;">
+{% block page_content %}
+    <div>
+        <h3 style="color:#f2f2f2">Search Page</h3>
+        <div class="search-container">
+            <h6>Работа по выбранному фандому:</h6>
+            <input list="fandoms" name="fandom">
+            <datalist id="fandoms">
+                <option value="TheWitcher">Ведьмак</option>
+                <option value="Original">Ориджинал</option>
+            </datalist>
+            <h6>Работа содержит жанры:</h6>
+            <table id="genres-table">
+                <tr>
+                 <td><input type="checkbox" name="AU" value="True"><label>AU</label></td>
+                 <td><input type="checkbox" name="Adventures" value="True"><label>Приключения</label></td>
+               </tr>
+            </table>
+            <h6>Работа соответствует выбранным возрастным ограничениям:</h6>
+            <input type="checkbox" name="G"><label>G</label>
+            <input type="checkbox" name="PG-13"><label>PG-13</label>
+            <input type="checkbox" name="R"><label>R</label>
+            <input type="checkbox" name="NC"><label>NC</label>
+            <button>Искать</button>
+        </div>
+    </div>
+{% endblock %}
+<div>
