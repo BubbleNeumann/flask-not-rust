@@ -176,5 +176,5 @@ class Fandom:
 
     def get_texts(self, id: int) -> list:
         texts = db.run_select(query=f'select Texts.* from Texts join Texts_Fandoms \
-                on Texts.id = Texts_Tags.text_id whre Texts_Fandoms.fandom_id = {id}')
+                on Texts.id = Texts_Tags.text_id where Texts_Fandoms.fandom_id = {id}')
         return [Text(*text) for text in texts]
