@@ -11,6 +11,10 @@ h3 {
     color: #cccccc;
 }
 
+h5 {
+    color: #cccccc;
+}
+
 h6 {
     color: #cccccc;
 }
@@ -22,4 +26,10 @@ h6 {
 
 .search-container label {
     color: #cccccc;
+}
+
+.text_preview {
+    width: 75%;
+    margin-left: auto;
+    margin-right: auto;
 }

@@ -1,0 +1,10 @@
+{% block text_preview %}
+<div class="container">
+    <h5>{{ text.title }}</h5>
+    <h6>{{ text.get_fandoms }}</h6>
+    <p>{{ text.get_tags }}</p>
+    <p>{{ text.age_restr }}</p>
+    <p>{{ text.lang }}</p>
+    <p>{{ text.descr }}</p>
+</div>
+{% endblock %}
