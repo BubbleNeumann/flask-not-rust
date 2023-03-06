@@ -28,17 +28,21 @@ class LoginForm(FlaskForm):
 def index():
     return render_template('index.html')
 
-@main.route('/about')
+# @main.route('/about')
 def about():
     return render_template('about.html')
 
-@main.route('/browse')
+@main.route('/text_view')
 def browse():
-    return render_template('browse.html')
+    return render_template('text_view.html')
 
 @main.route('/search')
 def search():
     return render_template('search.html')
+
+@main.route('/user')
+def user():
+    return render_template('user.html')
 
 @main.route('/auth/sign_up')
 def sign_up():

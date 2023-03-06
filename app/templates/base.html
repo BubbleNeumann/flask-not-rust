@@ -8,37 +8,23 @@
 {% block navbar %}
 <div class="navbar navbar-inverse navbar-static-top" role="navigation">
     <div class="container">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
+        <div class="navbar-header w-100">
             <a class="navbar-brand" href="/">flask-not-rust</a>
         </div>
-        <div class="navbar-collapse collapse">
+        <div class="navbar-collapse collapse w-100">
             <ul class="nav navbar-nav">
-                <li><a href="/browse">Browse</a></li>
+                <li><a href="/search">Поиск</a></li>
             </ul>
-            <ul class="nav navbar-nav">
-                <li><a href="/search">Search</a></li>
-            </ul>
-            <ul class="nav navbar-nav">
-                <li><a href="/about">About</a></li>
-            </ul>
-            <ul class="nav navbar-nav">
-                <li style="float:right"><a class="active" href="#user">Log in</a>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#user">Log in</a></li>
             </ul>
         </div>
     </div>
 </div>
 {% endblock %}
 
-<div class="cross-bg">
 {% block content %}
 <div class="container">
     {% block page_content %}{% endblock %}
 </div>
 {% endblock %}
-</div>
