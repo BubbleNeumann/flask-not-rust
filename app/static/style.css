@@ -11,3 +11,37 @@ h3 {
     color: #cccccc;
 }
 
+h4 {
+    color: #cccccc;
+}
+
+h5 {
+    color: #cccccc;
+}
+
+h6 {
+    color: #cccccc;
+}
+
+.search-container table{
+    width: 30%;
+    border: 0px solid;
+}
+
+.search-container label {
+    color: #cccccc;
+}
+
+.text_preview {
+    width: 75%;
+    margin-left: auto;
+    margin-right: auto;
+    background-color:#474646;
+    text-align: justify;
+    padding: 10px 30px 10px 20px;
+    border-left: 10px coral;
+}
+
+.text_preview p {
+    color: #cccccc;
+}
