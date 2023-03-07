@@ -6,11 +6,11 @@ from wtforms.validators import DataRequired, EqualTo
 
 
 class SignUpForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
-    email = StringField('Email', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired(), EqualTo('password2', message='Passwords must match.')])
-    password2 = PasswordField('Confirm password', validators=[DataRequired()])
-    submit = SubmitField('Sign Up')
+    username = StringField('Имя пользователя:', validators=[DataRequired()])
+    email = StringField('Почта:', validators=[DataRequired()])
+    password = PasswordField('Пароль:', validators=[DataRequired(), EqualTo('password2', message='Passwords must match.')])
+    password2 = PasswordField('Повторите пароль:', validators=[DataRequired()])
+    submit = SubmitField('Зарегистрироваться')
 
     def validate_username(self, field):
         pass
@@ -28,10 +28,6 @@ class LoginForm(FlaskForm):
 def index():
     return render_template('index.html')
 
-# @main.route('/about')
-def about():
-    return render_template('about.html')
-
 @main.route('/text_view')
 def browse():
     return render_template('text_view.html')
@@ -44,11 +40,15 @@ def search():
 def user():
     return render_template('user.html')
 
-@main.route('/auth/sign_up')
+@main.route('/upload')
+def upload():
+    return render_template('upload.html')
+
+@main.route('/sign_up')
 def sign_up():
     form = SignUpForm()
     return render_template('auth/signup.html', form=form)
 
-@main.route('/auth/login')
+@main.route('/login')
 def login():
-    return render_template('auth/login.html')
+    return render_template('login.html')

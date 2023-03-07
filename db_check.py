@@ -1,5 +1,5 @@
 import sqlite3
-from app.models import User, Text
+from app.models import User, Text, Tag, Fandom
 
 connection = sqlite3.connect('database.db')
 cur = connection.cursor()
@@ -38,12 +38,15 @@ for table in tables:
 # print()
 # new_test_user = User(id=None, username='newname', email='newemail', password='pass', role_id='2')
 # new_test_user.write_to_db(con=connection)
+
+# new_test_user = User.get_user_by_id(7)
 # print(new_test_user)
 # connection.commit()
 # print(new_test_user.get_texts())
 # users = cur.execute('select * from Users').fetchall()
 # print(users)
 # new_test_user.delete_from_db(con=connection)
+
 # users = cur.execute('select * from Users').fetchall()
 # print(users)
 # new_test_user.delete_from_db(cur=cur)
@@ -52,14 +55,20 @@ for table in tables:
 #
 # print(users)
 
-#
-#
-# connection.commit()
-
 text = Text.get_text_by_id(2)
-print(text.get_fandoms())
-# user = User.get_user_by_id(2)
+text.title = "new title"
+text.write_to_db(user_id=1)
+user = User.get_user_by_id(1)
+
+print(user.get_texts())
+# print(text.get_fandoms())
+# print(text.get_tags())
+# user = User.get_user_by_id(3)
 # print(user)
+# print(user.get_texts())
+#
+# print(Tag.get_all_tags())
+# print(Fandom.get_all_fandoms())
 
 
 connection.close()

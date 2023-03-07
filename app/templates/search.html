@@ -6,27 +6,22 @@
 {% block page_content %}
     <div style="width:75%; margin-left:auto; margin-right:auto;">
         <h2 style="color:#f2f2f2">Поиск</h2>
+        <input></input>
+        <h3 style="color:#f2f2f2">Фильтры</h3>
         <div class="search-container">
-            <h6>Работа по выбранному фандому:</h6>
+            <p style="margin-top: 20px;">Работа по выбранному фандому:</p>
             <input list="fandoms" name="fandom">
             <datalist id="fandoms">
-                <option value="TheWitcher">Ведьмак</option>
+                <option value="The Witcher">Ведьмак</option>
                 <option value="Original">Ориджинал</option>
             </datalist>
-            <h6>Работа содержит жанры:</h6>
-            <table id="genres-table">
-                <tr>
-                 <td><input type="checkbox" name="AU" value="True"><label>AU</label></td>
-                 <td><input type="checkbox" name="Adventures" value="True"><label>Приключения</label></td>
-               </tr>
-            </table>
-            <h6>Работа соответствует выбранным возрастным ограничениям:</h6>
-            <input type="checkbox" name="G"><label>G</label>
-            <input type="checkbox" name="PG-13"><label>PG-13</label>
-            <input type="checkbox" name="R"><label>R</label>
-            <input type="checkbox" name="NC"><label>NC</label>
+            <p style="margin-top: 20px;">Работа содержит жанры:</p>
+            {% include "embed/_genres.html" %}
+            <p style="margin-top: 20px;">Работа соответствует выбранным возрастным ограничениям:</p>
+            {% include "embed/_age_restr.html" %}
         </div>
-        <button>Искать</button>
+        <button style="margin-top: 20px;">Искать</button>
+
     </div>
 {% endblock %}
 <div>

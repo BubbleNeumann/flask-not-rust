@@ -58,8 +58,7 @@ class User:
         )
 
     def __repr__(self) -> str:
-        return f'{self.__class__.__name__}: {self.id} {self.username} \
-                {self.email} {"admin" if self.role_id == 1 else ""}'
+        return f'{self.__class__.__name__}: {self.id} {self.username} {self.email} {"admin" if self.role_id == 1 else ""}'
 
 
 class Text:
@@ -140,7 +139,6 @@ class Tag:
     def get_all_tags() -> list:
         return db.run_select(query='select * from Tags')
 
-    # TODO test this
     def write_to_db(self, con=None):
         db.modify_table(query=f'insert into Tags (name) values ("{self.name}")', con=con)
 

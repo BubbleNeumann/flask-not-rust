@@ -1,16 +1,14 @@
 {% extends "base.html" %}
 
 {% block content %}
+<div style="width:75%;  margin-top: 30px; margin-left:auto; margin-right:auto;">
     <h1>User: user.username</h1>
     <hr>
     <h3>Работы автора: </h3>
-    <div class="text_preview">
-        <h4>text.title</h4>
-        <h5>text.get_fandoms</h5>
-        <p>text.get_tags</p>
-        <p>text.age_restr</p>
-        <p>text.lang</p>
-        <p>text.descr</p>
-    </div>
+    
+    {% include "embed/_post.html"%}
+    {% include "embed/_post.html"%}
+    {% include "embed/_post.html"%}
+</div>
 {% endblock %}
 
