@@ -1,14 +1,22 @@
 {% extends "base.html" %}
 
-{% block content %}
-<div style="width:75%;  margin-top: 30px; margin-left:auto; margin-right:auto;">
-    <h1>User: user.username</h1>
+{% block title %}User - {{user.username}}{% endblock %}
+
+{% block page_content %}
+<div style="width:75%; margin:auto;">
+    <h2>@{{ user.username }}</h2>
     <hr>
     <h3>Работы автора: </h3>
-    
-    {% include "embed/_post.html"%}
-    {% include "embed/_post.html"%}
-    {% include "embed/_post.html"%}
+
+    <ul>
+        {% for text in texts %}
+        <div class="text_preview">
+            <a href="/text_view/{{text.id}}"><h3>{{text.title}}</h3></a>
+            <p>{{text.lang}}</p>
+            <p>{{text.descr}}</p>
+        </div>
+        {% endfor %}
+    </ul>
 </div>
 {% endblock %}
 

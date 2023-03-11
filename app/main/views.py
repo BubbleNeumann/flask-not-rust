@@ -4,6 +4,8 @@ from flask_wtf import FlaskForm
 from wtforms.fields import PasswordField, StringField, SubmitField
 from wtforms.validators import DataRequired, EqualTo
 
+from ..models import User, Text
+
 
 class SignUpForm(FlaskForm):
     username = StringField('Имя пользователя:', validators=[DataRequired()])
@@ -28,17 +30,21 @@ class LoginForm(FlaskForm):
 def index():
     return render_template('index.html')
 
-@main.route('/text_view')
-def browse():
-    return render_template('text_view.html')
+@main.route('/text_view/<int:id>')
+def text_view(id: int):
+    text = Text.get_text_by_id(id=id)
+    print(text)
+    return render_template('text_view.html', text=text)
 
 @main.route('/search')
 def search():
     return render_template('search.html')
 
-@main.route('/user')
-def user():
-    return render_template('user.html')
+@main.route('/user/<username>')
+def user(username):
+    user = User.get_user_by_username(username=username)
+    texts = user.get_texts()
+    return render_template('user.html', user=user, texts=texts)
 
 @main.route('/upload')
 def upload():

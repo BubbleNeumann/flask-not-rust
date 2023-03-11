@@ -13,10 +13,12 @@ class User:
         self.critics_att = critics_att
 
     def get_texts(self) -> list:
-        return db.run_select(
-            query=f'select Texts.title from Texts_Users join Texts \
+        raw_texts = db.run_select(
+            query=f'select Texts.* from Texts_Users join Texts \
             on Texts_Users.text_id = Texts.id where Texts_Users.user_id = {self.id}'
         )
+
+        return [Text(*text) for text in raw_texts]
 
     def write_to_db(self, con=None) -> None:
         self.id = db.modify_table(
@@ -31,6 +33,10 @@ class User:
     @staticmethod
     def get_user_by_id(id: int):
         return User(*db.run_select(query=f'select * from Users where id = {id}')[0])
+
+    @staticmethod
+    def get_user_by_username(username: str):
+        return User(*db.run_select(query=f'select * from Users where username = "{username}"')[0])
 
     def delete_from_db(self, con=None) -> None:
         texts_to_delete = db.run_select(
