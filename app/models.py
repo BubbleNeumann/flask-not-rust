@@ -80,18 +80,30 @@ class Text:
         self.age_restr = age_restr
 
     @staticmethod
+    def get_latest(begin: int):
+        texts = db.run_select(query=f'select * from Texts where id >= {begin} limit 10')
+        return [Text(*text) for text in texts]
+
+    @staticmethod
     def get_text_by_id(id: int):
         return Text(*db.run_select(query=f'select * from Texts where id = {id}')[0])
+
+    def get_authors(self) -> list:
+        authors = db.run_select(query=f'select Users.* from Users join Texts_Users\
+                on Users.id = Texts_Users.user_id where Texts_Users.text_id = {self.id}')
+        return [User(*user) for user in authors]
 
     def get_tags(self) -> list:
         query = f'select Tags.* from Tags join Texts_Tags \
                 on Tags.id = Texts_Tags.tag_id where Texts_Tags.text_id = {self.id}'
-        return db.run_select(query=query)
+        tags = db.run_select(query=query)
+        return [Tag(*tag) for tag in tags]
 
     def get_fandoms(self) -> list:
-        query = f'select Tags.name from Tags join Texts_Tags \
-                on Tags.id = Texts_Tags.tag_id where Texts_Tags.text_id = {self.id}'
-        return db.run_select(query=query)
+        query = f'select Fandoms.* from Fandoms join Texts_Fandoms \
+                on Fandoms.id = Texts_Fandoms.fandom_id where Texts_Fandoms.text_id = {self.id}'
+        fandoms = db.run_select(query=query)
+        return [Fandom(*fandom) for fandom in fandoms]
 
     def add_tag(self, tag_id: int, con=None) -> None:
         db.modify_table(query=f'insert into Texts_Tags (text_id, tag_id) \

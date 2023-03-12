@@ -28,13 +28,14 @@ class LoginForm(FlaskForm):
 
 @main.route('/')
 def index():
-    return render_template('index.html')
+    latest_texts = Text.get_latest(1)
+    return render_template('index.html', texts=latest_texts)
 
 @main.route('/text_view/<int:id>')
 def text_view(id: int):
     text = Text.get_text_by_id(id=id)
-    print(text)
-    return render_template('text_view.html', text=text)
+    authors = text.get_authors()
+    return render_template('text_view.html', text=text, authors=authors)
 
 @main.route('/search')
 def search():

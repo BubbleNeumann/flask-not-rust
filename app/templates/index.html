@@ -8,9 +8,18 @@
     <h2>Последние работы</h2>
 </div>
 <div style="width:75%; margin:auto;">
-    {% include "embed/_post.html" %}
-    {% include "embed/_post.html" %}
-    {% include "embed/_post.html" %}
+    {% for text in texts %}
+    <div class="text_preview">
+        <a href="/text_view/{{text.id}}"><h3>{{text.title}}</h3></a>
+        <p><b>Автор(ы):</b> {% for user in text.get_authors() %}<a href="/user/{{user.username}}"> {{user.username}}</a> {% endfor %}</p>
+        <p><b>Фандом:</b> {% for fandom in text.get_fandoms() %} {{fandom.name}}{% endfor %}</p>
+        <p><b>Метки:</b> {% for tag in text.get_tags() %} {{tag.name}}{% endfor %}</p>
+        <p><b>Дата публикации:</b> {{text.release_date}}</p>
+        <hr>
+        <p>{{text.descr}}</p>
+    </div>
+
+    {% endfor %}
 </div>
 {% endblock %}
 </div>

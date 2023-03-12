@@ -7,16 +7,16 @@
     <h2>@{{ user.username }}</h2>
     <hr>
     <h3>Работы автора: </h3>
-
-    <ul>
-        {% for text in texts %}
-        <div class="text_preview">
-            <a href="/text_view/{{text.id}}"><h3>{{text.title}}</h3></a>
-            <p>{{text.lang}}</p>
-            <p>{{text.descr}}</p>
-        </div>
-        {% endfor %}
-    </ul>
+    {% for text in texts %}
+    <div class="text_preview">
+        <a href="/text_view/{{text.id}}"><h3>{{text.title}}</h3></a>
+        <p><b>Фандом:</b> {% for fandom in text.get_fandoms() %} {{fandom.name}}{% endfor %}</p>
+        <p><b>Метки:</b> {% for tag in text.get_tags() %} {{tag.name}}{% endfor %}</p>
+        <p><b>Дата публикации:</b> {{text.release_date}}</p>
+        <hr>
+        <p>{{text.descr}}</p>
+    </div>
+    {% endfor %}
 </div>
 {% endblock %}
 
