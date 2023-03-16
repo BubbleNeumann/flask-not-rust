@@ -1,6 +1,7 @@
 import sqlite3
 import sys
 
+
 def main():
     connection = sqlite3.connect('database.db')
 
@@ -11,16 +12,18 @@ def main():
     connection.commit()
     connection.close()
 
+
 def fill_tables():
     connection = sqlite3.connect('database.db')
     cur = connection.cursor()
 
     # Roles
     for role in ['admin', 'user', 'banned']:
-        cur.execute(f'insert into Roles (name) VALUES (?)', (role,))
+        cur.execute('insert into Roles (name) VALUES (?)', (role,))
 
     # Tags
-    cur.execute('INSERT INTO Tags (name) VALUES (?)', ('Action',))
+    cur.execute('INSERT INTO Tags (name, rus_name) VALUES (?, ?)',
+                ('Action', 'Приключения'))
 
     # Fandoms
     cur.execute('INSERT INTO Fandoms (name) VALUES (?)', ('The Witcher',))
@@ -31,7 +34,7 @@ def fill_tables():
 
     # Roles_Permissions
     # admin can post and ban, user can post
-    interrel = [('1','1'), ('2','1'), ('1','2')]
+    interrel = [('1', '1'), ('2', '1'), ('1', '2')]
     for rel in interrel:
         cur.execute('INSERT INTO Roles_Permissions (permission_id, role_id) VALUES (?, ?)', rel)
 
@@ -49,13 +52,12 @@ def fill_tables():
 
         cur.execute('INSERT INTO Texts_Fandoms (text_id, fandom_id) VALUES (?, ?)',
                     (f'{i}', '1'))
-        
 
     connection.commit()
     connection.close()
+
 
 if __name__ == '__main__':
     main()
     if len(sys.argv) > 1 and sys.argv[1] == '--with-data':
         fill_tables()
-

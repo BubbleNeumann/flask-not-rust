@@ -59,7 +59,8 @@ drop table if exists Tags;
 
 create table Tags (
     id integer primary key autoincrement,
-    name varchar not null
+    name varchar not null,
+    rus_name varchar not null
 );
 
 drop table if exists Texts_Tags;

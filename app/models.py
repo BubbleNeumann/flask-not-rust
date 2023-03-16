@@ -88,6 +88,10 @@ class Text:
     def get_text_by_id(id: int):
         return Text(*db.run_select(query=f'select * from Texts where id = {id}')[0])
 
+    @staticmethod
+    def get_age_restrs() -> list:
+        return ['G', 'PG-13', 'R', 'NC']
+
     def get_authors(self) -> list:
         authors = db.run_select(query=f'select Users.* from Users join Texts_Users\
                 on Users.id = Texts_Users.user_id where Texts_Users.text_id = {self.id}')
@@ -145,9 +149,10 @@ class Text:
 
 
 class Tag:
-    def __init__(self, id, name) -> None:
+    def __init__(self, id, name, rus_name) -> None:
         self.id = id
         self.name = name
+        self.rus_name = rus_name
 
     @staticmethod
     def get_tag_by_id(id: int):
@@ -155,18 +160,26 @@ class Tag:
 
     @staticmethod
     def get_all_tags() -> list:
-        return db.run_select(query='select * from Tags')
+        return [Tag(*tag) for tag in db.run_select(query='select * from Tags')]
 
     def write_to_db(self, con=None):
-        db.modify_table(query=f'insert into Tags (name) values ("{self.name}")', con=con)
+        db.modify_table(
+            query=f'insert into Tags (name, rus_name) \
+            values ("{self.name}", "{self.rus_name}")', con=con
+        )
 
     def delete_from_db(self, con=None):
         db.modify_table(query=f'delete from Tags where id = {id}', con=con)
-        db.modify_table(query=f'delete from Texts_Tags where tag_id = {id}', con=con)
+        db.modify_table(
+            query=f'delete from Texts_Tags where tag_id = {id}',
+            con=con
+        )
 
     def get_texts(self) -> list:
-        texts = db.run_select(query=f'select Texts.* from Texts join Texts_Tags \
-                on Texts.id = Texts_Tags.text_id where Texts_Tags.tag_id = {id}')
+        texts = db.run_select(
+            query=f'select Texts.* from Texts join Texts_Tags \
+                on Texts.id = Texts_Tags.text_id where Texts_Tags.tag_id = {id}'
+        )
         return [Text(*text) for text in texts]
 
 
