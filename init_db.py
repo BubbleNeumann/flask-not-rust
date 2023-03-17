@@ -24,16 +24,21 @@ def fill_tables():
     # Tags
     cur.execute('INSERT INTO Tags (name, rus_name) VALUES (?, ?)',
                 ('Action', 'Приключения'))
+    cur.execute('INSERT INTO Tags (name, rus_name) VALUES (?, ?)',
+                ('Anime', 'Аниме'))
 
     # Fandoms
-    cur.execute('INSERT INTO Fandoms (name) VALUES (?)', ('The Witcher',))
+    cur.execute('INSERT INTO Fandoms (name, rus_name) VALUES (?, ?)',
+                ('The Witcher', 'Ведьмак'))
+    cur.execute('INSERT INTO Fandoms (name, rus_name) VALUES (?, ?)',
+                ('Original', 'Ориджинал'))
 
     # Permissions
     for permis in ['post', 'ban']:
         cur.execute('INSERT INTO Permissions (name) VALUES (?)', (permis,))
 
     # Roles_Permissions
-    # admin can post and ban, user can post
+    # admin can post and ban, user can post, banned has no permissions
     interrel = [('1', '1'), ('2', '1'), ('1', '2')]
     for rel in interrel:
         cur.execute('INSERT INTO Roles_Permissions (permission_id, role_id) VALUES (?, ?)', rel)

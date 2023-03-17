@@ -1,10 +1,10 @@
 from . import main
-from flask import render_template
+from flask import render_template, request
 from flask_wtf import FlaskForm
 from wtforms.fields import PasswordField, StringField, SubmitField
 from wtforms.validators import DataRequired, EqualTo
 
-from ..models import User, Text, Tag
+from ..models import User, Text, Tag, Fandom
 
 
 class SignUpForm(FlaskForm):
@@ -21,13 +21,6 @@ class SignUpForm(FlaskForm):
         pass
 
 
-class LoginForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
-    email = StringField('Email', validators=[DataRequired()])
-    password = PasswordField('Password', )
-    submit = SubmitField('Sign Up')
-
-
 @main.route('/')
 def index():
     latest_texts = Text.get_latest(1)
@@ -41,12 +34,22 @@ def text_view(id: int):
     return render_template('text_view.html', text=text, authors=authors)
 
 
-@main.route('/search')
+@main.route('/search', methods=['GET', 'POST'])
 def search():
+    if request.method == 'POST' and request.form.get('submit') == 'Искать':
+        # print(request.form.getlist('tags'))
+        texts = Text.get_texts_with_tags(tags=request.form.getlist('tags'))
+        return render_template(
+            'search_results.html',
+            texts=texts
+        )
+
     return render_template(
         'search.html',
         age_restrs=Text.get_age_restrs(),
-        tags=Tag.get_all_tags())
+        tags=Tag.get_all_tags(),
+        fandoms=Fandom.get_all_fandoms()
+    )
 
 
 @main.route('/user/<username>')

@@ -76,7 +76,8 @@ drop table if exists Fandoms;
 
 create table Fandoms (
     id integer primary key autoincrement,
-    name varchar not null
+    name varchar not null,
+    rus_name varchar not null
 );
 
 drop table if exists Texts_Fandoms;

@@ -32,7 +32,7 @@ class User:
 
     @staticmethod
     def get_user_by_id(id: int):
-        return User(*db.run_select(query=f'select * from Users where id = {id}')[0])
+        return User(*db.run_select(f'select * from Users where id = {id}')[0])
 
     @staticmethod
     def get_user_by_username(username: str):
@@ -64,7 +64,8 @@ class User:
         )
 
     def __repr__(self) -> str:
-        return f'{self.__class__.__name__}: {self.id} {self.username} {self.email} {"admin" if self.role_id == 1 else ""}'
+        return f'{self.__class__.__name__}: {self.id} {self.username} \
+            {self.email} {"admin" if self.role_id == 1 else ""}'
 
 
 class Text:
@@ -92,6 +93,21 @@ class Text:
     def get_age_restrs() -> list:
         return ['G', 'PG-13', 'R', 'NC']
 
+    @staticmethod
+    def get_texts_with_tags(tags: list[str]) -> list:
+        res = []
+        for tag_name in tags:
+            tag = Tag.get_tag_by_name(tag_name)
+            res.extend(
+                [Text(*text) for text in db.run_select(
+                    query=f'select Texts.* from Texts join Texts_Tags \
+                    on Texts.id = Texts_Tags.text_id where Texts_Tags.tag_id = {tag.id}'
+                )]
+            )
+        # print(res)
+        # return [Text(*text) for text in res]
+        return set(res)
+
     def get_authors(self) -> list:
         authors = db.run_select(query=f'select Users.* from Users join Texts_Users\
                 on Users.id = Texts_Users.user_id where Texts_Users.text_id = {self.id}')
@@ -114,8 +130,11 @@ class Text:
                 values ("{self.id}", "{tag_id}")', con=con)
 
     def add_fandom(self, fandom_id: int, con=None) -> None:
-        db.modify_table(query=f'insert into Texts_Fandoms (text_id, fandom_id) \
-                values ("{self.id}", "{fandom_id}")', con=con)
+        db.modify_table(
+            query=f'insert into Texts_Fandoms (text_id, fandom_id) \
+                values ("{self.id}", "{fandom_id}")',
+            con=con
+        )
 
     def write_to_db(self, user_id: int, con=None) -> None:
         """
@@ -140,12 +159,12 @@ class Text:
                 query=f'delete from {table} where text_id="{self.id}"', con=con
             )
 
-    def __repr__(self) -> str:
-        query = f'select Users.username from Texts_Users inner join Users \
-                on Texts_Users.user_id = Users.id where Texts_Users.is_author = 1 \
-                and Texts_Users.text_id = {self.id}'
-        author = db.run_select(query=query)[0][0]
-        return f'{self.__class__.__name__}: {self.title} by {author} published {self.release_date}'
+    # def __repr__(self) -> str:
+    #     query = f'select Users.username from Texts_Users inner join Users \
+    #             on Texts_Users.user_id = Users.id where Texts_Users.is_author = 1 \
+    #             and Texts_Users.text_id = {self.id}'
+    #     author = db.run_select(query=query)[0][0]
+    #     return f'{self.__class__.__name__}: {self.title} by {author} published {self.release_date}'
 
 
 class Tag:
@@ -156,11 +175,15 @@ class Tag:
 
     @staticmethod
     def get_tag_by_id(id: int):
-        return Tag(*db.run_select(query=f'select * from Tags where id = {id}'))
+        return Tag(*db.run_select(f'select * from Tags where id = {id}')[0])
+
+    @staticmethod
+    def get_tag_by_name(name: str):
+        return Tag(*db.run_select(f'select * from Tags where name = "{name}"')[0])
 
     @staticmethod
     def get_all_tags() -> list:
-        return [Tag(*tag) for tag in db.run_select(query='select * from Tags')]
+        return [Tag(*tag) for tag in db.run_select('select * from Tags')]
 
     def write_to_db(self, con=None):
         db.modify_table(
@@ -184,9 +207,10 @@ class Tag:
 
 
 class Fandom:
-    def __init__(self, id, name) -> None:
+    def __init__(self, id, name, rus_name) -> None:
         self.id = id
         self.name = name
+        self.rus_name = rus_name
 
     @staticmethod
     def get_all_fandoms() -> list:
@@ -194,16 +218,23 @@ class Fandom:
 
     @staticmethod
     def get_fandom_by_id(id: int):
-        return Fandom(*db.run_select(query=f'select * from Fandoms where id = {id}'))
+        return Fandom(
+            *db.run_select(query=f'select * from Fandoms where id = {id}')
+        )
 
     def write_to_db(self, con=None) -> None:
-        self.id = db.modify_table(query=f'insert into Fandoms (name) values ("{self.name}")', con=con)
+        self.id = db.modify_table(
+            query=f'insert into Fandoms (name, rus_name) values ("{self.name}", "{self.rus_name}")',
+            con=con
+        )
 
     def delete_from_db(self, con=None):
         db.modify_table(query=f'delete from Fandoms where id = {id}', con=con)
         db.modify_table(query=f'delete from Texts_Fandoms where tag_id = {id}', con=con)
 
     def get_texts(self, id: int) -> list:
-        texts = db.run_select(query=f'select Texts.* from Texts join Texts_Fandoms \
-                on Texts.id = Texts_Tags.text_id where Texts_Fandoms.fandom_id = {id}')
+        texts = db.run_select(
+            query=f'select Texts.* from Texts join Texts_Fandoms \
+                on Texts.id = Texts_Tags.text_id where Texts_Fandoms.fandom_id = {id}'
+        )
         return [Text(*text) for text in texts]
