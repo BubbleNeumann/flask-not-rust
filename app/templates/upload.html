@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Index{% endblock %}
+
+<div style="background-color: #f2f2f2; padding: 15px; margin-bottom: 30px; margin-top: 20px;">
+    {% block page_content %}
+    <div style="width:75%; margin-left:auto; margin-right:auto;">
+        <form method="POST">
+            <h2 style="color:#f2f2f2">Добавить работу</h2>
+            <p>Название работы: </p>
+            <input name = "name"></input>
+            <p style="margin-top: 20px;">Работа по выбранному фандому:</p>
+            <input list="fandoms" name="fandom">
+            <datalist id="fandoms">
+                {% for fandom in fandoms%}
+                <option value={{fandom.name}}>{{fandom.rus_name}}</option>
+                {% endfor %}
+                <!-- <option value="The Witcher">Ведьмак</option> -->
+                <!-- <option value="Original">Ориджинал</option> -->
+            </datalist>
+            <p>Работа содержит жанры:</p>
+            {% for tag in tags %}
+            <div>
+                <input type="checkbox" name="tags" value={{tag.name}}><label>{{tag.rus_name}}</label>
+            </div>
+            {% endfor %}
+            <p style="margin-top: 20px;">Работа соответствует выбранному возрастному ограничению:</p>
+            {% for age_restr in age_restrs %}
+            <div>
+                <input type="radio" name="age_restr" value={{age_restr}}><label>{{age_restr}}</label>
+            </div>
+            {% endfor %}
+            <textarea></textarea>
+            <input type="submit" name="submit" value="Добавить">
+        </form>
+    
+    </div>
+    {% endblock %}
+    <div>

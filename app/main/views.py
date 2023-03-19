@@ -59,9 +59,18 @@ def user(username):
     return render_template('user.html', user=user, texts=texts)
 
 
-@main.route('/upload')
+@main.route('/upload', methods=['GET', 'POST'])
 def upload():
-    return render_template('upload.html')
+    if request.method == 'POST' and request.form.get('submit') == 'Добавить':
+        
+        return render_template()
+
+    return render_template(
+        'upload.html', 
+        age_restrs=Text.get_age_restrs(),
+        tags=Tag.get_all_tags(),
+        fandoms=Fandom.get_all_fandoms()
+    )
 
 
 @main.route('/sign_up')
