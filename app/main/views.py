@@ -62,8 +62,19 @@ def user(username):
 @main.route('/upload', methods=['GET', 'POST'])
 def upload():
     if request.method == 'POST' and request.form.get('submit') == 'Добавить':
-        
-        return render_template()
+        tags = request.form.get('tags')
+        new_text.title = request.form.get('title')
+        new_text.descr = request.form.get('descr')
+        new_text.age_restr = request.form.get('age_restr')
+        fandoms = request.form.get('fandoms')
+        file_name = str(Text.get_next_id()) + '.txt'
+        f.open(file_name, 'w')
+        for i in request.form.get('text'):
+            f.write(i + '\n')
+        f.close()
+        new_text.text_file = file_name
+        new_text.write_to_db(user)
+        return render_template(upload_done.html)
 
     return render_template(
         'upload.html', 

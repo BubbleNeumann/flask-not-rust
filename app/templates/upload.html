@@ -8,7 +8,7 @@
         <form method="POST">
             <h2 style="color:#f2f2f2">Добавить работу</h2>
             <p>Название работы: </p>
-            <input name = "name"></input>
+            <input name = "title"></input>
             <p style="margin-top: 20px;">Работа по выбранному фандому:</p>
             <input list="fandoms" name="fandom">
             <datalist id="fandoms">
@@ -30,7 +30,10 @@
                 <input type="radio" name="age_restr" value={{age_restr}}><label>{{age_restr}}</label>
             </div>
             {% endfor %}
-            <textarea></textarea>
+            <p>Краткое описание работы: </p>
+            <textarea name="descr" onkeyup="this.value=this.value.substring(0,250);"></textarea>
+            <p>Текст работы</p>
+            <textarea name="text"></textarea>
             <input type="submit" name="submit" value="Добавить">
         </form>
     

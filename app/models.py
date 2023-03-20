@@ -86,6 +86,11 @@ class Text:
         return [Text(*text) for text in texts]
 
     @staticmethod
+    def get_next_id() -> int:
+        index = db.run_select(query=f'select count(*) from Texts')
+        return index
+
+    @staticmethod
     def get_text_by_id(id: int):
         return Text(*db.run_select(query=f'select * from Texts where id = {id}')[0])
 
