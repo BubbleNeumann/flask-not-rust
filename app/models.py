@@ -15,7 +15,8 @@ class User:
     def get_texts(self) -> list:
         raw_texts = db.run_select(
             query=f'select Texts.* from Texts_Users join Texts \
-            on Texts_Users.text_id = Texts.id where Texts_Users.user_id = {self.id}'
+            on Texts_Users.text_id = Texts.id \
+            where Texts_Users.user_id = {self.id}'
         )
 
         return [Text(*text) for text in raw_texts]
@@ -36,7 +37,11 @@ class User:
 
     @staticmethod
     def get_user_by_username(username: str):
-        return User(*db.run_select(query=f'select * from Users where username = "{username}"')[0])
+        return User(
+            *db.run_select(
+                query=f'select * from Users where username = "{username}"'
+            )[0]
+        )
 
     def delete_from_db(self, con=None) -> None:
         texts_to_delete = db.run_select(
@@ -47,19 +52,26 @@ class User:
         for text in texts_to_delete:
             Text(*text).delete_from_db(con=con)
 
-        db.modify_table(query=f'delete from Users where id = "{self.id}"', con=con)
+        db.modify_table(
+            query=f'delete from Users where id = "{self.id}"',
+            con=con
+        )
 
     @staticmethod
     def username_is_available(username: str) -> bool:
         return (
-            len(db.run_select(query=f'select * from Users where username = {username}'))
+            len(db.run_select(
+                query=f'select * from Users where username = {username}'
+                ))
             == 0
         )
 
     @staticmethod
     def email_is_available(email: str) -> bool:
         return (
-            len(db.run_select(query=f'select * from Users where email = {email}'))
+            len(db.run_select(
+                query=f'select * from Users where email = {email}'
+                ))
             == 0
         )
 
@@ -82,31 +94,64 @@ class Text:
 
     @staticmethod
     def get_latest(begin: int):
-        texts = db.run_select(query=f'select * from Texts where id >= {begin} limit 10')
+        texts = db.run_select(
+            query=f'select * from Texts where id >= {begin} limit 10'
+        )
         return [Text(*text) for text in texts]
 
     @staticmethod
     def get_text_by_id(id: int):
-        return Text(*db.run_select(query=f'select * from Texts where id = {id}')[0])
+        return Text(
+            *db.run_select(query=f'select * from Texts where id = {id}')[0]
+        )
 
+    # TODO refactor with enum
     @staticmethod
     def get_age_restrs() -> list:
         return ['G', 'PG-13', 'R', 'NC']
 
     @staticmethod
-    def get_texts_with_tags(tags: list[str]) -> list:
-        res = []
-        for tag_name in tags:
-            tag = Tag.get_tag_by_name(tag_name)
-            res.extend(
-                [Text(*text) for text in db.run_select(
-                    query=f'select Texts.* from Texts join Texts_Tags \
-                    on Texts.id = Texts_Tags.text_id where Texts_Tags.tag_id = {tag.id}'
-                )]
+    def search_request(
+            title: str = None,
+            tags: list = None,
+            age_restr: str = None
+    ) -> list:
+        if title is None and tags is None and age_restr is None:
+            return []
+
+        join_needed = len(tags) > 0
+        query = 'select '
+        if join_needed:
+            query += 'Texts.* from Texts join Texts_Tags \
+            on Texts.id = Texts_Tags.text_id where '
+            query += ' and '.join(
+                ['Texts_Tags.tag_id = ' + str(Tag.get_tag_by_name(tag).id) for tag in tags]
             )
-        # print(res)
-        # return [Text(*text) for text in res]
-        return set(res)
+        else:
+            query += '* from Texts where '
+
+        if title is not None:
+            query += f' {"and " if join_needed else ""}\
+            {"Texts.title" if join_needed else "title"} like "%{title}%" '
+
+        if age_restr is not None:
+
+            int_restr = 0
+            match age_restr:
+                case 'G':
+                    int_restr = 6
+                case 'PG-13':
+                    int_restr = 13
+                case 'R':
+                    int_restr = 17
+                case 'NC':
+                    int_restr = 21
+
+            query += f'{"" if query.endswith("where ") else "and "}\
+            {"Texts.age_restr" if join_needed else "age_restr"} <= {int_restr}'
+
+        query = " ".join(query.split())
+        return [Text(*text) for text in db.run_select(query=query)]
 
     def get_authors(self) -> list:
         authors = db.run_select(query=f'select Users.* from Users join Texts_Users\
@@ -150,6 +195,11 @@ class Text:
                 values ("{self.id}", "{user_id}", "1")'
         db.modify_table(query=query, con=con)
 
+    # @staticmethod
+    # def search(title_ref: str, tags: list, age_restrs: list) -> list:
+    #     query = f'select {"* from Texts"if len(tags) == 0 else "Texts.* from Texts join Texts_Tags"}'
+    #     pass
+
     def delete_from_db(self, con=None) -> None:
         db.modify_table(query=f'delete from Texts where id = "{self.id}"', con=con)
 
@@ -159,12 +209,23 @@ class Text:
                 query=f'delete from {table} where text_id="{self.id}"', con=con
             )
 
-    # def __repr__(self) -> str:
-    #     query = f'select Users.username from Texts_Users inner join Users \
-    #             on Texts_Users.user_id = Users.id where Texts_Users.is_author = 1 \
-    #             and Texts_Users.text_id = {self.id}'
-    #     author = db.run_select(query=query)[0][0]
-    #     return f'{self.__class__.__name__}: {self.title} by {author} published {self.release_date}'
+    def __repr__(self) -> str:
+        query = f'select Users.username from Texts_Users inner join Users \
+                on Texts_Users.user_id = Users.id where Texts_Users.is_author = 1 \
+                and Texts_Users.text_id = {self.id}'
+        author = db.run_select(query=query)[0][0]
+        return f'{self.__class__.__name__}: {self.title} by {author} published {self.release_date}'
+
+    def __eq__(self, other) -> bool:
+        return self.id == other.id
+
+    def __ne__(self, other) -> bool:
+        return not self == other
+
+    def __hash__(self) -> int:
+        # consider self.id to bo unique
+        # since it gets autoincremented and assigned by db
+        return hash(self.id)
 
 
 class Tag:

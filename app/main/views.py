@@ -1,24 +1,6 @@
 from . import main
 from flask import render_template, request
-from flask_wtf import FlaskForm
-from wtforms.fields import PasswordField, StringField, SubmitField
-from wtforms.validators import DataRequired, EqualTo
-
 from ..models import User, Text, Tag, Fandom
-
-
-class SignUpForm(FlaskForm):
-    username = StringField('Имя пользователя:', validators=[DataRequired()])
-    email = StringField('Почта:', validators=[DataRequired()])
-    password = PasswordField('Пароль:', validators=[DataRequired(), EqualTo('password2', message='Passwords must match.')])
-    password2 = PasswordField('Повторите пароль:', validators=[DataRequired()])
-    submit = SubmitField('Зарегистрироваться')
-
-    def validate_username(self, field):
-        pass
-
-    def validate_email(self, field):
-        pass
 
 
 @main.route('/')
@@ -37,11 +19,13 @@ def text_view(id: int):
 @main.route('/search', methods=['GET', 'POST'])
 def search():
     if request.method == 'POST' and request.form.get('submit') == 'Искать':
-        # print(request.form.getlist('tags'))
-        texts = Text.get_texts_with_tags(tags=request.form.getlist('tags'))
         return render_template(
             'search_results.html',
-            texts=texts
+            texts=Text.search_request(
+                title=request.form.get('title'),
+                tags=request.form.getlist('tags'),
+                age_restr=request.form.get('age_restr')
+            )
         )
 
     return render_template(
@@ -66,8 +50,7 @@ def upload():
 
 @main.route('/sign_up')
 def sign_up():
-    form = SignUpForm()
-    return render_template('auth/signup.html', form=form)
+    pass
 
 
 @main.route('/login')

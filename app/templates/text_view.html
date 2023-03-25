@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Text - {{text.title}}{% endblock %}
+
+{% block page_content %}
+<div style="width:75%; margin:auto;">
+    <h2>{{text.title}}</h2>
+    <p><b>Автор(ы):</b> {% for user in text.get_authors() %} <a href="/user/{{user.username}}"> {{user.username}}</a>{% endfor %}</p>
+    <div>
+    </div>
+</div>
+{% endblock %}
+
+
