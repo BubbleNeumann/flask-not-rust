@@ -1,10 +1,15 @@
 
+**features to mention:**
+* login required for upload (automatic redirect)
+* alert on sign up if username or email is not available
+* user session id shown in url is encrypted by md5 via User.\_\_repr__ overload
+* 
 
 ## Project design
 
 ![design.jpg](https://raw.githubusercontent.com/BubbleNeumann/flask-not-rust/master/design.jpg)
 
-### Project sructure example
+### Project structure example
 
 ```
 /home/user/Projects/flask

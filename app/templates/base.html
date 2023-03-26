@@ -18,9 +18,16 @@
             <ul class="nav navbar-nav">
                 <li><a href="/upload">Загрузить</a></li>
             </ul>
+            {% if not current_user.is_authenticated %}
             <ul class="nav navbar-nav navbar-right">
-                <li><a href="/sign_up">Log in</a></li>
+                <li><a href="/login">Войти</a></li>
             </ul>
+            {% endif %}
+            {% if current_user.is_authenticated %}
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/logout">Выйти</a></li>
+            </ul>
+            {% endif %}
         </div>
     </div>
 </div>

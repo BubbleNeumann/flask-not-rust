@@ -10,8 +10,8 @@
     {% for text in texts %}
     <div class="text_preview">
         <a href="/text_view/{{text.id}}"><h3>{{text.title}}</h3></a>
-        <p><b>Фандом:</b> {% for fandom in text.get_fandoms() %} {{fandom.name}}{% endfor %}</p>
-        <p><b>Метки:</b> {% for tag in text.get_tags() %} {{tag.name}}{% endfor %}</p>
+        <p><b>Фандом:</b> {% for fandom in text.get_fandoms() %} {{fandom.rus_name}}{% endfor %}</p>
+        <p><b>Метки:</b> {% for tag in text.get_tags() %} {{tag.rus_name}}{% endfor %}</p>
         <p><b>Дата публикации:</b> {{text.release_date}}</p>
         <hr>
         <p>{{text.descr}}</p>

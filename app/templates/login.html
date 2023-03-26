@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Log in{% endblock %}
+
+{% block page_content %}
+<div style="width:75%; margin:auto;">
+    {% for message in get_flashed_messages() %}
+    <div class="alert alert-warning">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        {{ message }}
+    </div>
+    {% endfor %}
+    <form method="POST">
+        <h2>Вход</h2>
+        <input name=email placeholder="Почта" type="email">
+        <h5></h5>
+        <input name=password placeholder="Пароль" type="password">
+        <h5></h5>
+        <button name="submit" value="submit">Войти</button>
+    </form>
+</div>
+{% endblock %}
+

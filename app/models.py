@@ -1,9 +1,11 @@
+# import self as self
+from flask_login import UserMixin
 from . import db
 
 
-class User:
+class User(UserMixin):
     def __init__(
-        self, id, username, email, password, role_id, critics_att=None
+        self, id, username, email, password, role_id=2, critics_att=None
     ) -> None:
         self.id = id
         self.username = username
@@ -11,6 +13,12 @@ class User:
         self.password = password
         self.role_id = role_id
         self.critics_att = critics_att
+
+    def is_anonymous(self) -> bool:
+        return False
+    #
+    # def get_id(self) -> int:
+    #     return self.id
 
     def get_texts(self) -> list:
         raw_texts = db.run_select(
@@ -43,6 +51,15 @@ class User:
             )[0]
         )
 
+    @staticmethod
+    def get_user_by_email(email: str):
+        """Needed for log in."""
+        return User(
+            *db.run_select(
+                query=f'select * from Users where email = "{email}"'
+            )[0]
+        )
+
     def delete_from_db(self, con=None) -> None:
         texts_to_delete = db.run_select(
             query=f'select Texts.* from Texts join Texts_Users \
@@ -61,7 +78,7 @@ class User:
     def username_is_available(username: str) -> bool:
         return (
             len(db.run_select(
-                query=f'select * from Users where username = {username}'
+                query=f'select * from Users where username = "{username}"'
                 ))
             == 0
         )
@@ -70,14 +87,17 @@ class User:
     def email_is_available(email: str) -> bool:
         return (
             len(db.run_select(
-                query=f'select * from Users where email = {email}'
+                query=f'select * from Users where email = "{email}"'
                 ))
             == 0
         )
 
+    # def __repr__(self) -> str:
+    #     return f'{self.__class__.__name__}: {self.id} {self.username} \
+    #         {self.email} {"admin" if self.role_id == 1 else ""}'
     def __repr__(self) -> str:
-        return f'{self.__class__.__name__}: {self.id} {self.username} \
-            {self.email} {"admin" if self.role_id == 1 else ""}'
+        import hashlib
+        return hashlib.md5(self.username.encode('utf-8')).hexdigest()
 
 
 class Text:
@@ -116,6 +136,9 @@ class Text:
             tags: list = None,
             age_restr: str = None
     ) -> list:
+        """
+        :rtype: list[Text]
+        """
         if title is None and tags is None and age_restr is None:
             return []
 
@@ -135,7 +158,6 @@ class Text:
             {"Texts.title" if join_needed else "title"} like "%{title}%" '
 
         if age_restr is not None:
-
             int_restr = 0
             match age_restr:
                 case 'G':
@@ -195,11 +217,6 @@ class Text:
                 values ("{self.id}", "{user_id}", "1")'
         db.modify_table(query=query, con=con)
 
-    # @staticmethod
-    # def search(title_ref: str, tags: list, age_restrs: list) -> list:
-    #     query = f'select {"* from Texts"if len(tags) == 0 else "Texts.* from Texts join Texts_Tags"}'
-    #     pass
-
     def delete_from_db(self, con=None) -> None:
         db.modify_table(query=f'delete from Texts where id = "{self.id}"', con=con)
 
@@ -215,17 +232,6 @@ class Text:
                 and Texts_Users.text_id = {self.id}'
         author = db.run_select(query=query)[0][0]
         return f'{self.__class__.__name__}: {self.title} by {author} published {self.release_date}'
-
-    def __eq__(self, other) -> bool:
-        return self.id == other.id
-
-    def __ne__(self, other) -> bool:
-        return not self == other
-
-    def __hash__(self) -> int:
-        # consider self.id to bo unique
-        # since it gets autoincremented and assigned by db
-        return hash(self.id)
 
 
 class Tag:
@@ -253,16 +259,16 @@ class Tag:
         )
 
     def delete_from_db(self, con=None):
-        db.modify_table(query=f'delete from Tags where id = {id}', con=con)
+        db.modify_table(query=f'delete from Tags where id = {self.id}', con=con)
         db.modify_table(
-            query=f'delete from Texts_Tags where tag_id = {id}',
+            query=f'delete from Texts_Tags where tag_id = {self.id}',
             con=con
         )
 
     def get_texts(self) -> list:
         texts = db.run_select(
             query=f'select Texts.* from Texts join Texts_Tags \
-                on Texts.id = Texts_Tags.text_id where Texts_Tags.tag_id = {id}'
+                on Texts.id = Texts_Tags.text_id where Texts_Tags.tag_id = {self.id}'
         )
         return [Text(*text) for text in texts]
 
