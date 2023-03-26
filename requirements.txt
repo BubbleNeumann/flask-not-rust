@@ -4,5 +4,3 @@ flask-wtf
 python-dotenv
 coverage
 flask-login
-
-self~=2020.12.3
