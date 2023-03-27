@@ -47,6 +47,9 @@ def user(username):
             user.update_role(new_role_id=3)
         if request.form.get('ban') == 'no-ban':
             user.update_role(new_role_id=2)
+        if not request.form.get('remove') is None:
+            text_id = request.form.get('remove')
+            Text.get_text_by_id(text_id).delete_from_db()
 
     texts = user.get_texts()
     return render_template(
@@ -57,10 +60,51 @@ def user(username):
     )
 
 
-@main.route('/upload')
+@main.route('/upload', methods=['GET', 'POST'])
 @login_required
 def upload():
-    return render_template('upload.html')
+    if request.method == 'POST' and request.form.get('submit') == 'upload':
+        title = request.form.get('title')
+        desc = request.form.get('descr')
+        text = request.form.get('text')
+
+        # TODO check if tags and fandoms are not empty
+        tags = request.form.getlist('tags')
+        fandoms = request.form.getlist('fandoms')
+
+        if len(text) < 100:
+            flash('Текст не может быть короче 100 символов.')
+        elif len(desc) < 100:
+            flash('Описание не может быть короче 100 символов.')
+        elif len(title) < 3:
+            flash('Название работы не может быть короче 3 символов.')
+        elif len(tags) == 0:
+            flash('Укажите хотя бы один тег.')
+        elif len(fandoms) == 0:
+            flash('Укажите хотя бы один фандом.')
+        else:
+            from datetime import date
+            new_text = Text(
+                id=None,
+                title=title,
+                text_file=text,
+                release_date=date.today(),
+                lang=None,
+                descr=desc,
+                age_restr=None
+            )
+            new_text.write_to_db(
+                user_id=current_user.id,
+                tags=tags,
+                fandoms=fandoms
+            )
+            return redirect(url_for('main.user', username=current_user.username))
+
+    return render_template(
+        'upload.html',
+        tags=Tag.get_all_tags(),
+        fandoms=Fandom.get_all_fandoms()
+    )
 
 
 @main.route('/signup', methods=['GET', 'POST'])

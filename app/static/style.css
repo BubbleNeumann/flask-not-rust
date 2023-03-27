@@ -52,3 +52,13 @@ p {
     border-radius: 5px;
 }
 
+button {
+    padding: 6px;
+    padding-left: 12px;
+    padding-right: 12px;
+    border-radius: 5px;
+    background-color: #474646;
+    border: none;
+    outline: none;
+    color: #cccccc;
+}

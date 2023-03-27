@@ -4,6 +4,7 @@
 * alert on sign up if username or email is not available
 * user session id shown in url is encrypted by md5 via User.\_\_repr__ overload
 * alert on login if email wasn't found in db
+* upload: limitations on title, description, and text min length
 
 ![index-screen.jpg](https://raw.githubusercontent.com/BubbleNeumann/flask-not-rust/master/docs/index-screen.jpg)
 

@@ -201,7 +201,7 @@ class Text:
             con=con
         )
 
-    def write_to_db(self, user_id: int, con=None) -> None:
+    def write_to_db(self, user_id: int, tags: list, fandoms:list, con=None) -> None:
         """
         Writes self object to db.
         Sets self.id by getting cursor.lastrowid from db.
@@ -214,6 +214,21 @@ class Text:
         query = f'insert into Texts_Users (text_id, user_id, is_author)\
                 values ("{self.id}", "{user_id}", "1")'
         db.modify_table(query=query, con=con)
+
+        # fill the tags
+        for tag in tags:
+            tag_id = Tag.get_tag_by_name(tag).id
+            query = f'insert into Texts_Tags (text_id, tag_id) \
+            values ("{self.id}", "{tag_id}")'
+            db.modify_table(query=query, con=con)
+
+        # fill the fandoms
+        for fandom in fandoms:
+            fandom_id = Fandom.get_fandom_by_name(fandom).id
+            query = f'insert into Texts_Fandoms (text_id, fandom_id) \
+            values ("{self.id}", "{fandom_id}")'
+            db.modify_table(query=query, con=con)
+
 
     def delete_from_db(self, con=None) -> None:
         db.modify_table(query=f'delete from Texts where id = "{self.id}"', con=con)
@@ -279,12 +294,18 @@ class Fandom:
 
     @staticmethod
     def get_all_fandoms() -> list:
-        return db.run_select(query='select * from Fandoms')
+        return [Fandom(*fandom) for fandom in db.run_select(query='select * from Fandoms')]
 
     @staticmethod
     def get_fandom_by_id(id: int):
         return Fandom(
             *db.run_select(query=f'select * from Fandoms where id = {id}')
+        )
+
+    @staticmethod
+    def get_fandom_by_name(name: str):
+        return Fandom(
+            *db.run_select(f'select * from Fandoms where name = "{name}"')[0]
         )
 
     def write_to_db(self, con=None) -> None:

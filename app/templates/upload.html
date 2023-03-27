@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Index{% endblock %}
+
+<div style="background-color: #f2f2f2; padding: 15px; margin-bottom: 30px; margin-top: 20px;">
+{% block page_content %}
+<div style="width:75%; margin-left:auto; margin-right:auto;">
+    {% for message in get_flashed_messages() %}
+    <div class="alert alert-warning">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        {{ message }}
+    </div>
+    {% endfor %}
+    <form method="POST">
+        <h2 style="color:#f2f2f2">Добавить работу</h2>
+        <p>Название работы: </p>
+        <input name = "title"></input>
+        <p style="margin-top: 20px;">Работа по выбранному фандому:</p>
+        {% for fandom in fandoms %}
+        <div>
+            <input type="checkbox" name="fandoms" value={{fandom.name}}><label>{{fandom.rus_name}}</label>
+        </div>
+        {% endfor %}
+        <p>Работа содержит жанры:</p>
+        {% for tag in tags %}
+        <div>
+            <input type="checkbox" name="tags" value={{tag.name}}><label>{{tag.rus_name}}</label>
+        </div>
+        {% endfor %}
+        <p style="margin-top: 20px;">Работа соответствует выбранному возрастному ограничению:</p>
+        {% for age_restr in age_restrs %}
+        <div>
+            <input type="radio" name="age_restr" value={{age_restr}}><label>{{age_restr}}</label>
+        </div>
+        {% endfor %}
+        <p>Краткое описание работы: </p>
+        <textarea name="descr" onkeyup="this.value=this.value.substring(0,250);"></textarea>
+        <p>Текст работы</p>
+        <textarea name="text"></textarea>
+        <!-- <input type="submit" name="submit" value="Добавить"> -->
+        <button name=submit value="upload">Добавить</button>
+    </form>
+
+</div>
+{% endblock %}
+<div>

@@ -7,6 +7,7 @@
     <h2>{{text.title}}</h2>
     <p><b>Автор(ы):</b> {% for user in text.get_authors() %} <a href="/user/{{user.username}}"> {{user.username}}</a>{% endfor %}</p>
     <div>
+        <p>{{text.text_file}}
     </div>
 </div>
 {% endblock %}
