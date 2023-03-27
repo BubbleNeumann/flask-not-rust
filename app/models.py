@@ -16,9 +16,6 @@ class User(UserMixin):
 
     def is_anonymous(self) -> bool:
         return False
-    #
-    # def get_id(self) -> int:
-    #     return self.id
 
     def get_texts(self) -> list:
         raw_texts = db.run_select(
@@ -38,6 +35,12 @@ class User(UserMixin):
 
     def add_text(self, text, con=None) -> None:
         text.write_to_db(user_id=self.id, con=con)
+
+    def update_role(self, new_role_id: int) -> None:
+        self.role_id = new_role_id
+        db.modify_table(
+            f'update Users set role_id = {new_role_id} where id = {self.id}'
+        )
 
     @staticmethod
     def get_user_by_id(id: int):
@@ -92,9 +95,6 @@ class User(UserMixin):
             == 0
         )
 
-    # def __repr__(self) -> str:
-    #     return f'{self.__class__.__name__}: {self.id} {self.username} \
-    #         {self.email} {"admin" if self.role_id == 1 else ""}'
     def __repr__(self) -> str:
         import hashlib
         return hashlib.md5(self.username.encode('utf-8')).hexdigest()
@@ -125,8 +125,6 @@ class Text:
             *db.run_select(query=f'select * from Texts where id = {id}')[0]
         )
 
-    # TODO refactor with enum
-    @staticmethod
     def get_age_restrs() -> list:
         return ['G', 'PG-13', 'R', 'NC']
 

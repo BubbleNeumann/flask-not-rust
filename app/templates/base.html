@@ -27,6 +27,9 @@
             <ul class="nav navbar-nav navbar-right">
                 <li><a href="/logout">Выйти</a></li>
             </ul>
+            <ul class="nav navbar-nav navbar-right">
+                    <li><a href="/user/{{current_user.username}}">{{current_user.username}}</a></li>
+            </ul>
             {% endif %}
         </div>
     </div>

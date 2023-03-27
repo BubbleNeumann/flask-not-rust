@@ -39,12 +39,22 @@ def search():
     )
 
 
-@main.route('/user/<username>')
+@main.route('/user/<username>', methods=['GET', 'POST'])
 def user(username):
-    # TODO if logged in show link to profile in navbar
     user = User.get_user_by_username(username=username)
+    if request.method == 'POST':
+        if request.form.get('ban') == 'ban':
+            user.update_role(new_role_id=3)
+        if request.form.get('ban') == 'no-ban':
+            user.update_role(new_role_id=2)
+
     texts = user.get_texts()
-    return render_template('user.html', user=user, texts=texts)
+    return render_template(
+        'user.html',
+        user=user,
+        texts=texts,
+        texts_cnt=len(texts)
+    )
 
 
 @main.route('/upload')
@@ -91,20 +101,14 @@ def login():
     if request.method == 'POST' and request.form.get('submit') == 'submit':
         email: str = request.form.get('email')
         password: str = hashlib.md5(request.form.get('password').encode('utf-8')).hexdigest()
+
         # check if there is a registered user with given email
-        if not User.email_is_available(email):
-            user = User.get_user_by_email(email)
-            if user.password == password:
-                # login here
-                login_user(user, remember=True, force=True)
-                print(current_user)
-            else:
-                flash('Пароль не подходит.')
-                # TODO alert on incorrect password
-                print('wrong password')
+        user = User.get_user_by_email(email)
+        if not User.email_is_available(email) and user.password == password:
+            login_user(user, remember=True, force=True)
         else:
-            print('nowhere')
-            # TODO suggest to sign up
+            flash('Некорректно введены почта или пароль.')
+            return render_template('login.html')
 
         return redirect(url_for('main.index', current_user=current_user))
 

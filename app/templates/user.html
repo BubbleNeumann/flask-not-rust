@@ -4,8 +4,20 @@
 
 {% block page_content %}
 <div style="width:75%; margin:auto;">
+    {% if current_user.role_id == 1  and current_user.id != user.id %}
+    <form method='POST'>
+        {% if user.role_id == 2 %}
+        <button name=ban value="ban">Забанить нахуй.</button>
+        {% endif %}
+        {% if user.role_id == 3 %}
+        <button name=ban value="no-ban">Разбанить.</button>
+        {% endif %}
+    </form>
+    {% endif %}
     <h2>@{{ user.username }}</h2>
     <hr>
+    {% if user.role_id != 3 %}
+        {% if texts_cnt > 0 %}
     <h3>Работы автора: </h3>
     {% for text in texts %}
     <div class="text_preview">
@@ -17,6 +29,14 @@
         <p>{{text.descr}}</p>
     </div>
     {% endfor %}
+    {% endif %}
+    {% if texts_cnt == 0 %}
+    <p>У этого пользователя нет опубликованных текстов.</p>
+    {% endif %}
+    {% endif %}
+    {% if user.role_id == 3 %}
+    <p>Пользователь был заблокирован модератором сообщества.</p>
+    {% endif %}
 </div>
-{% endblock %}
+    {% endblock %}
 
