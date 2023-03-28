@@ -68,9 +68,10 @@ def upload():
         desc = request.form.get('descr')
         text = request.form.get('text')
 
-        # TODO check if tags and fandoms are not empty
         tags = request.form.getlist('tags')
         fandoms = request.form.getlist('fandoms')
+
+        age_restr = request.form.get('age_restr')
 
         if len(text) < 100:
             flash('Текст не может быть короче 100 символов.')
@@ -82,8 +83,20 @@ def upload():
             flash('Укажите хотя бы один тег.')
         elif len(fandoms) == 0:
             flash('Укажите хотя бы один фандом.')
+        elif age_restr is None:
+            flash('Укажите возрастное ограничение.')
         else:
             from datetime import date
+            int_restr = 0
+            match age_restr:
+                case 'G':
+                    int_restr = 6
+                case 'PG-13':
+                    int_restr = 13
+                case 'R':
+                    int_restr = 17
+                case 'NC':
+                    int_restr = 21
             new_text = Text(
                 id=None,
                 title=title,
@@ -91,7 +104,7 @@ def upload():
                 release_date=date.today(),
                 lang=None,
                 descr=desc,
-                age_restr=None
+                age_restr=int_restr
             )
             new_text.write_to_db(
                 user_id=current_user.id,
@@ -103,7 +116,8 @@ def upload():
     return render_template(
         'upload.html',
         tags=Tag.get_all_tags(),
-        fandoms=Fandom.get_all_fandoms()
+        fandoms=Fandom.get_all_fandoms(),
+        age_restrs=Text.get_age_restrs()
     )
 
 
